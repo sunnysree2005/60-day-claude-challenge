@@ -1,0 +1,322 @@
+
+<style>
+  .container { padding: 1.5rem 0; max-width: 680px; }
+  .score-ring { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .score-circle { width: 100px; height: 100px; border-radius: 50%; background: var(--bg-success); border: 3px solid var(--border-success); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .score-num { font-size: 28px; font-weight: 500; color: var(--text-success); line-height: 1; }
+  .score-label { font-size: 12px; color: var(--text-success); }
+  .score-title { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+  .section { margin-bottom: 2rem; }
+  .section-header { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; border-bottom: 0.5px solid var(--border); padding-bottom: 6px; }
+  .gap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .gap-card { background: var(--surface-1); border: 0.5px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .gap-card-title { font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .tag { display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: 20px; margin: 2px; }
+  .tag-missing { background: var(--bg-danger); color: var(--text-danger); border: 0.5px solid var(--border-danger); }
+  .tag-opportunity { background: var(--bg-warning); color: var(--text-warning); border: 0.5px solid var(--border-warning); }
+  .tag-present { background: var(--bg-success); color: var(--text-success); border: 0.5px solid var(--border-success); }
+  .resume-box { background: var(--surface-1); border: 0.5px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+  .resume-name { font-size: 22px; font-weight: 500; color: var(--text-primary); margin-bottom: 4px; }
+  .resume-contact { font-size: 13px; color: var(--text-accent); margin-bottom: 1.5rem; }
+  .resume-section { margin-bottom: 1.25rem; }
+  .resume-h2 { font-size: 13px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-muted); border-bottom: 0.5px solid var(--border); padding-bottom: 5px; margin-bottom: 10px; }
+  .resume-summary { font-size: 13.5px; line-height: 1.7; color: var(--text-primary); }
+  .resume-job { margin-bottom: 12px; }
+  .resume-job-header { display: flex; justify-content: space-between; align-items: baseline; }
+  .resume-job-title { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+  .resume-job-date { font-size: 12px; color: var(--text-muted); }
+  .resume-job-org { font-size: 13px; color: var(--text-accent); margin-bottom: 5px; }
+  .resume-bullets { margin: 0; padding-left: 16px; }
+  .resume-bullets li { font-size: 13px; line-height: 1.65; color: var(--text-primary); margin-bottom: 3px; }
+  .skill-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .skill-label { font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
+  .skill-tag { font-size: 12px; padding: 3px 10px; border-radius: 20px; background: var(--bg-accent); color: var(--text-accent); border: 0.5px solid var(--border-accent); }
+  .copy-btn { display: flex; align-items: center; gap: 6px; font-size: 13px; padding: 7px 16px; border-radius: var(--radius); cursor: pointer; background: transparent; border: 0.5px solid var(--border-strong); color: var(--text-primary); margin-bottom: 1rem; }
+  .copy-btn:hover { background: var(--surface-1); }
+  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+  .metric { background: var(--surface-1); border-radius: var(--radius); padding: 12px; text-align: center; }
+  .metric-val { font-size: 20px; font-weight: 500; color: var(--text-primary); }
+  .metric-lbl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .bar { height: 6px; border-radius: 3px; background: var(--border); margin-top: 8px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; background: var(--fill-success); }
+</style>
+
+<div class="container">
+  <h2 class="sr-only">ATS Resume Optimizer results for Software Engineer role</h2>
+
+  <div class="section">
+    <div class="section-header">ATS match score</div>
+    <div style="display:flex; align-items:center; gap:2rem;">
+      <div class="score-ring">
+        <div class="score-circle">
+          <span class="score-num">62</span>
+          <span class="score-label">/ 100</span>
+        </div>
+        <span class="score-title">Before optimization</span>
+      </div>
+      <div style="font-size:22px; color:var(--text-muted);">→</div>
+      <div class="score-ring">
+        <div class="score-circle" style="background:var(--bg-accent); border-color:var(--border-accent);">
+          <span class="score-num" style="color:var(--text-accent);">84</span>
+          <span class="score-label" style="color:var(--text-accent);">/ 100</span>
+        </div>
+        <span class="score-title">After optimization</span>
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:13px; color:var(--text-secondary); margin-bottom:10px;">Key improvements</div>
+        <div style="font-size:12px; color:var(--text-primary); line-height:1.8;">
+          ✓ Added professional summary<br>
+          ✓ Restructured skills with SE keywords<br>
+          ✓ Strengthened bullet points with action verbs<br>
+          ✓ Surfaced software engineering competencies
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">Gap analysis</div>
+    <div class="gap-grid">
+      <div class="gap-card">
+        <div class="gap-card-title"><i class="ti ti-alert-circle" aria-hidden="true" style="font-size:15px; color:var(--text-danger)"></i> Missing keywords</div>
+        <span class="tag tag-missing">Software Development Life Cycle</span>
+        <span class="tag tag-missing">Agile / Scrum</span>
+        <span class="tag tag-missing">System Design</span>
+        <span class="tag tag-missing">REST APIs</span>
+        <span class="tag tag-missing">Testing / Debugging</span>
+        <span class="tag tag-missing">Version Control</span>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-title"><i class="ti ti-bulb" aria-hidden="true" style="font-size:15px; color:var(--text-warning)"></i> Improvement opportunities</div>
+        <span class="tag tag-opportunity">No professional summary</span>
+        <span class="tag tag-opportunity">Weak bullet verbs</span>
+        <span class="tag tag-opportunity">Git not highlighted</span>
+        <span class="tag tag-opportunity">No metrics/outcomes</span>
+        <span class="tag tag-opportunity">Robotics buried</span>
+      </div>
+      <div class="gap-card" style="grid-column: span 2;">
+        <div class="gap-card-title"><i class="ti ti-check" aria-hidden="true" style="font-size:15px; color:var(--text-success)"></i> Present strengths mapped to SE role</div>
+        <span class="tag tag-present">C++ / Python / Java</span>
+        <span class="tag tag-present">OOP principles</span>
+        <span class="tag tag-present">SQL & DBMS</span>
+        <span class="tag tag-present">Git / GitHub</span>
+        <span class="tag tag-present">Backend scripting</span>
+        <span class="tag tag-present">Web dev (frontend + backend)</span>
+        <span class="tag tag-present">Automation</span>
+        <span class="tag tag-present">Ethical hacking / network security</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">Optimized resume</div>
+    <button class="copy-btn" onclick="copyResume()"><i class="ti ti-copy" aria-hidden="true"></i> Copy resume text</button>
+    <div class="resume-box" id="resume-content">
+      <div class="resume-name">Sreeja Ghosh</div>
+      <div class="resume-contact">+8801741621693 · sreeja.ghosh@email.com · linkedin.com/in/sreeja-ghosh-350ab537a · github.com/sunnysree2005 · Dhaka, Bangladesh</div>
+
+      <div class="resume-section">
+        <div class="resume-h2">Professional summary</div>
+        <p class="resume-summary">Motivated Electronics and Telecommunication Engineering undergraduate with hands-on software development experience across C++, Python, and web technologies. Actively applying object-oriented programming, backend automation, and database skills through concurrent internships in C++, Python, and web development. Passionate about building robust, scalable software solutions with a foundation in data structures, algorithms, computer networks, and network security.</p>
+      </div>
+
+      <div class="resume-section">
+        <div class="resume-h2">Technical skills</div>
+        <div class="skill-label">Languages</div>
+        <div class="skill-group">
+          <span class="skill-tag">C++</span><span class="skill-tag">Python</span><span class="skill-tag">Java</span><span class="skill-tag">C</span><span class="skill-tag">SQL</span><span class="skill-tag">MATLAB</span>
+        </div>
+        <div class="skill-label">Tools & platforms</div>
+        <div class="skill-group">
+          <span class="skill-tag">Git</span><span class="skill-tag">GitHub</span><span class="skill-tag">VS Code</span><span class="skill-tag">Arduino</span>
+        </div>
+        <div class="skill-label">Core competencies</div>
+        <div class="skill-group">
+          <span class="skill-tag">Object-Oriented Programming</span><span class="skill-tag">Software Development</span><span class="skill-tag">Backend Scripting & Automation</span><span class="skill-tag">Web Development</span><span class="skill-tag">Relational Databases</span><span class="skill-tag">Data Structures & Algorithms</span><span class="skill-tag">Ethical Hacking & Network Security</span><span class="skill-tag">Embedded Systems</span>
+        </div>
+      </div>
+
+      <div class="resume-section">
+        <div class="resume-h2">Experience</div>
+
+        <div class="resume-job">
+          <div class="resume-job-header">
+            <span class="resume-job-title">C++ Programming Intern</span>
+            <span class="resume-job-date">May 2026 – Present</span>
+          </div>
+          <div class="resume-job-org">CodeAlpha</div>
+          <ul class="resume-bullets">
+            <li>Designed and developed robust application modules applying object-oriented programming (OOP) principles — encapsulation, inheritance, and polymorphism — in C++.</li>
+            <li>Implemented STL components (&lt;vector&gt;, &lt;string&gt;) with comprehensive input validation, improving software reliability and reducing runtime errors.</li>
+          </ul>
+        </div>
+
+        <div class="resume-job">
+          <div class="resume-job-header">
+            <span class="resume-job-title">Python Programming Intern</span>
+            <span class="resume-job-date">June 2026 – Present</span>
+          </div>
+          <div class="resume-job-org">Code Decode Labs</div>
+          <ul class="resume-bullets">
+            <li>Engineered clean, modular, and optimized backend scripts and automation modules using Python, following software development best practices.</li>
+            <li>Contributed to codebase maintainability by structuring reusable functions and applying consistent coding standards across automation pipelines.</li>
+          </ul>
+        </div>
+
+        <div class="resume-job">
+          <div class="resume-job-header">
+            <span class="resume-job-title">Web Development Intern</span>
+            <span class="resume-job-date">June 2026 – Present</span>
+          </div>
+          <div class="resume-job-org">Hex Softwares</div>
+          <ul class="resume-bullets">
+            <li>Contributed to frontend and backend integration pipelines, improving website responsiveness and layout structure across multiple client projects.</li>
+            <li>Collaborated with the development team to debug, test, and deploy web application features using version control (Git/GitHub).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="resume-section">
+        <div class="resume-h2">Projects</div>
+
+        <div class="resume-job">
+          <div class="resume-job-header">
+            <span class="resume-job-title">Robotics Project Developer — Stage 3</span>
+            <span class="resume-job-date">Jan 2026 – Present</span>
+          </div>
+          <div class="resume-job-org">Roboment R&D Lab</div>
+          <ul class="resume-bullets">
+            <li>Progressed through competitive Stage 1 and 2 selections, completing 13 core hands-on assignments in automation and sensor integration.</li>
+            <li>Currently developing advanced robotics configurations with a focus on hardware-software integration and embedded systems programming.</li>
+          </ul>
+        </div>
+
+        <div class="resume-job">
+          <div class="resume-job-header">
+            <span class="resume-job-title">4-Axis Robotic Arm Model</span>
+            <span class="resume-job-date">Jan 2026</span>
+          </div>
+          <div class="resume-job-org">Team ElectroKnights — RUET</div>
+          <ul class="resume-bullets">
+            <li>Co-developed a functional 4-DOF micro robotic arm using an Arduino Nano and MG90S servo motors, demonstrating applied software-hardware integration skills.</li>
+            <li>Programmed and fine-tuned firmware parameters to achieve precise multi-axis trajectories and smooth servo motor synchronization.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="resume-section">
+        <div class="resume-h2">Education</div>
+        <div class="resume-job">
+          <div class="resume-job-header">
+            <span class="resume-job-title">B.Sc. in Electronics and Telecommunication Engineering (ETE)</span>
+            <span class="resume-job-date">Expected 2028</span>
+          </div>
+          <div class="resume-job-org">Rajshahi University of Engineering and Technology (RUET), Bangladesh</div>
+          <ul class="resume-bullets">
+            <li>CGPA: 3.17 / 4.00 (up to 2nd semester)</li>
+            <li>Relevant coursework: Data Structures & Algorithms, Object-Oriented Programming, Computer Networks, DBMS</li>
+          </ul>
+        </div>
+        <div class="resume-job">
+          <div class="resume-job-header">
+            <span class="resume-job-title">Higher Secondary Certificate (HSC) — Science</span>
+            <span class="resume-job-date">2023</span>
+          </div>
+          <div class="resume-job-org">Holy Cross College · GPA: 5.00 / 5.00</div>
+        </div>
+        <div class="resume-job">
+          <div class="resume-job-header">
+            <span class="resume-job-title">Secondary School Certificate (SSC) — Science</span>
+            <span class="resume-job-date">2021</span>
+          </div>
+          <div class="resume-job-org">Viqarunnisa Noon School & College · GPA: 5.00 / 5.00</div>
+        </div>
+      </div>
+
+      <div class="resume-section">
+        <div class="resume-h2">Certifications</div>
+        <ul class="resume-bullets">
+          <li>Ethical Hacking & Network Security — Cisco Networking Academy (Expected June 2026)</li>
+          <li>Technology, Cyber, and Data Analytics Job Simulations — Deloitte via Forage (May–June 2026)</li>
+          <li>SQL and Relational Databases 101 — IBM Skills Network (May 2026)</li>
+          <li>Life Skills with Smart Brain Workshop — Soft Skill x Bangla Innovator (Jan 2026)</li>
+        </ul>
+      </div>
+
+      <div class="resume-section">
+        <div class="resume-h2">Achievements & activities</div>
+        <ul class="resume-bullets">
+          <li>Active member, Team ElectroKnights — RUET Engineering Project Team</li>
+          <li>Participant, RoboDuino Workshop — Robotic Society of RUET</li>
+          <li>Secured consecutive GPA 5.00/5.00 in both SSC and HSC national examinations</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function copyResume() {
+  const resume = `SREEJA GHOSH
++8801741621693 · sreeja.ghosh@email.com · linkedin.com/in/sreeja-ghosh-350ab537a · github.com/sunnysree2005 · Dhaka, Bangladesh
+
+PROFESSIONAL SUMMARY
+Motivated Electronics and Telecommunication Engineering undergraduate with hands-on software development experience across C++, Python, and web technologies. Actively applying object-oriented programming, backend automation, and database skills through concurrent internships in C++, Python, and web development. Passionate about building robust, scalable software solutions with a foundation in data structures, algorithms, computer networks, and network security.
+
+TECHNICAL SKILLS
+Languages: C++, Python, Java, C, SQL, MATLAB
+Tools & Platforms: Git, GitHub, VS Code, Arduino
+Core Competencies: Object-Oriented Programming, Software Development, Backend Scripting & Automation, Web Development, Relational Databases, Data Structures & Algorithms, Ethical Hacking & Network Security, Embedded Systems
+
+EXPERIENCE
+
+C++ Programming Intern | CodeAlpha | May 2026 – Present
+• Designed and developed robust application modules applying object-oriented programming (OOP) principles — encapsulation, inheritance, and polymorphism — in C++.
+• Implemented STL components (<vector>, <string>) with comprehensive input validation, improving software reliability and reducing runtime errors.
+
+Python Programming Intern | Code Decode Labs | June 2026 – Present
+• Engineered clean, modular, and optimized backend scripts and automation modules using Python, following software development best practices.
+• Contributed to codebase maintainability by structuring reusable functions and applying consistent coding standards across automation pipelines.
+
+Web Development Intern | Hex Softwares | June 2026 – Present
+• Contributed to frontend and backend integration pipelines, improving website responsiveness and layout structure across multiple client projects.
+• Collaborated with the development team to debug, test, and deploy web application features using version control (Git/GitHub).
+
+PROJECTS
+
+Robotics Project Developer — Stage 3 | Roboment R&D Lab | Jan 2026 – Present
+• Progressed through competitive Stage 1 and 2 selections, completing 13 core hands-on assignments in automation and sensor integration.
+• Currently developing advanced robotics configurations with a focus on hardware-software integration and embedded systems programming.
+
+4-Axis Robotic Arm Model | Team ElectroKnights — RUET | Jan 2026
+• Co-developed a functional 4-DOF micro robotic arm using an Arduino Nano and MG90S servo motors, demonstrating applied software-hardware integration skills.
+• Programmed and fine-tuned firmware parameters to achieve precise multi-axis trajectories and smooth servo motor synchronization.
+
+EDUCATION
+
+B.Sc. in Electronics and Telecommunication Engineering (ETE) | RUET, Bangladesh | Expected 2028
+• CGPA: 3.17 / 4.00 (up to 2nd semester)
+• Relevant coursework: Data Structures & Algorithms, Object-Oriented Programming, Computer Networks, DBMS
+
+Higher Secondary Certificate (HSC) — Science | Holy Cross College | 2023 | GPA: 5.00/5.00
+Secondary School Certificate (SSC) — Science | Viqarunnisa Noon School & College | 2021 | GPA: 5.00/5.00
+
+CERTIFICATIONS
+• Ethical Hacking & Network Security — Cisco Networking Academy (Expected June 2026)
+• Technology, Cyber, and Data Analytics Job Simulations — Deloitte via Forage (May–June 2026)
+• SQL and Relational Databases 101 — IBM Skills Network (May 2026)
+• Life Skills with Smart Brain Workshop — Soft Skill x Bangla Innovator (Jan 2026)
+
+ACHIEVEMENTS & ACTIVITIES
+• Active member, Team ElectroKnights — RUET Engineering Project Team
+• Participant, RoboDuino Workshop — Robotic Society of RUET
+• Secured consecutive GPA 5.00/5.00 in both SSC and HSC national examinations`;
+
+  navigator.clipboard.writeText(resume).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> Copied!';
+    setTimeout(() => { btn.innerHTML = '<i class="ti ti-copy" aria-hidden="true"></i> Copy resume text'; }, 2000);
+  });
+}
+</script>
