@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio — ETE Engineer</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #0A2A2F;
+    --bg2:      #0F333A;
+    --bg3:      #143B44;
+    --green:    #00FF9C;
+    --amber:    #FFB347;
+    --offwhite: #E8EDF0;
+    --slate:    #8A9BA8;
+    --mono:     'Share Tech Mono', monospace;
+    --sans:     'Inter', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--offwhite);
+    font-family: var(--sans);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 2.5rem;
+    background: rgba(10,42,47,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(0,255,156,0.12);
+  }
+  .nav-logo {
+    font-family: var(--mono);
+    color: var(--green);
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+  }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--slate);
+    text-decoration: none;
+    letter-spacing: 0.06em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--green); }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 7rem 2.5rem 4rem;
+    gap: 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .hero-text { max-width: 520px; }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--green);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+  }
+  .hero-eyebrow::before { content: '> '; }
+
+  .hero-name {
+    font-family: var(--mono);
+    font-size: clamp(2.4rem, 4vw, 3.6rem);
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--offwhite);
+    margin-bottom: 0.4rem;
+  }
+  .hero-name span { color: var(--green); }
+
+  .hero-title {
+    font-family: var(--mono);
+    font-size: clamp(1rem, 1.6vw, 1.25rem);
+    color: var(--amber);
+    margin-bottom: 1.6rem;
+    letter-spacing: 0.04em;
+  }
+
+  .hero-desc {
+    font-size: 0.95rem;
+    color: var(--slate);
+    margin-bottom: 2rem;
+    line-height: 1.75;
+  }
+
+  .hero-cta {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+  }
+  .btn-primary {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    padding: 0.7rem 1.6rem;
+    background: var(--green);
+    color: var(--bg);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    display: inline-block;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-secondary {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    padding: 0.7rem 1.6rem;
+    background: transparent;
+    color: var(--green);
+    border: 1px solid rgba(0,255,156,0.4);
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s;
+    display: inline-block;
+  }
+  .btn-secondary:hover { border-color: var(--green); }
+
+  /* ── CIRCUIT CANVAS ── */
+  .hero-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  #circuit-canvas {
+    width: 100%;
+    max-width: 420px;
+    height: 420px;
+    display: block;
+  }
+
+  /* ── SECTION SHELL ── */
+  section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 5rem 2.5rem;
+  }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--green);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .section-label::before { content: '/* '; }
+  .section-label::after  { content: ' */'; }
+  .section-title {
+    font-family: var(--mono);
+    font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+    color: var(--offwhite);
+    margin-bottom: 2.8rem;
+    font-weight: 400;
+  }
+
+  /* ── SKILLS ── */
+  #skills { border-top: 1px solid rgba(0,255,156,0.1); }
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.2rem;
+  }
+  .skill-card {
+    background: var(--bg2);
+    border: 1px solid rgba(0,255,156,0.08);
+    padding: 1.4rem 1.6rem;
+    transition: border-color 0.25s, transform 0.2s;
+  }
+  .skill-card:hover {
+    border-color: rgba(0,255,156,0.35);
+    transform: translateY(-2px);
+  }
+  .skill-card-head {
+    display: flex; align-items: center; gap: 0.7rem;
+    margin-bottom: 0.9rem;
+  }
+  .skill-icon { font-size: 1.25rem; }
+  .skill-cat {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--amber);
+    letter-spacing: 0.06em;
+  }
+  .skill-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .tag {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    padding: 0.25rem 0.6rem;
+    background: rgba(0,255,156,0.08);
+    color: var(--green);
+    border: 1px solid rgba(0,255,156,0.18);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── PROJECT CARDS ── */
+  #projects { border-top: 1px solid rgba(0,255,156,0.1); }
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.6rem;
+  }
+  .project-card {
+    background: var(--bg2);
+    border: 1px solid rgba(0,255,156,0.08);
+    padding: 2rem;
+    position: relative;
+    transition: border-color 0.25s;
+    overflow: hidden;
+  }
+  .project-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--green), transparent);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .project-card:hover { border-color: rgba(0,255,156,0.25); }
+  .project-card:hover::before { opacity: 1; }
+  .project-type {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--amber);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.7rem;
+  }
+  .project-name {
+    font-family: var(--mono);
+    font-size: 1.15rem;
+    color: var(--offwhite);
+    margin-bottom: 0.8rem;
+    line-height: 1.3;
+  }
+  .project-desc {
+    font-size: 0.88rem;
+    color: var(--slate);
+    line-height: 1.7;
+    margin-bottom: 1.2rem;
+  }
+  .project-stack { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .stack-pill {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    padding: 0.2rem 0.55rem;
+    background: rgba(255,179,71,0.1);
+    color: var(--amber);
+    border: 1px solid rgba(255,179,71,0.2);
+  }
+
+  /* ── ABOUT / STATS ── */
+  #about { border-top: 1px solid rgba(0,255,156,0.1); }
+  .about-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+  .about-text p {
+    font-size: 0.95rem;
+    color: var(--slate);
+    line-height: 1.8;
+    margin-bottom: 1rem;
+  }
+  .about-text strong { color: var(--offwhite); font-weight: 500; }
+  .stats-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .stat-box {
+    background: var(--bg2);
+    border: 1px solid rgba(0,255,156,0.1);
+    padding: 1.4rem;
+    text-align: center;
+  }
+  .stat-val {
+    font-family: var(--mono);
+    font-size: 2rem;
+    color: var(--green);
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+  .stat-lbl {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--slate);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── CONTACT ── */
+  #contact {
+    border-top: 1px solid rgba(0,255,156,0.1);
+    text-align: center;
+  }
+  .contact-inner { max-width: 540px; margin: 0 auto; }
+  .contact-prompt {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--slate);
+    margin-bottom: 2.5rem;
+    line-height: 1.8;
+  }
+  .contact-prompt code {
+    color: var(--green);
+    background: rgba(0,255,156,0.08);
+    padding: 0.1em 0.4em;
+  }
+  .contact-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid rgba(0,255,156,0.08);
+    padding: 1.5rem 2.5rem;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: rgba(138,155,168,0.5);
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: rgba(0,255,156,0.3); }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">[ RUET/ETE/2024 ]</span>
+  <ul class="nav-links">
+    <li><a href="#skills">skills</a></li>
+    <li><a href="#projects">projects</a></li>
+    <li><a href="#about">about</a></li>
+    <li><a href="#contact">contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div style="max-width:1200px;margin:0 auto;">
+<section id="hero" style="max-width:none;padding:7rem 2.5rem 4rem;">
+  <div class="hero-text">
+    <p class="hero-eyebrow">ETE Engineer · RUET · Bangladesh</p>
+    <h1 class="hero-name">Embedded<br><span>Systems</span><br>Engineer</h1>
+    <p class="hero-title">[ Electronics &amp; Telecommunication ]</p>
+    <p class="hero-desc">
+      Robotics builder, signal-processing tinkerer, and DSA practitioner at Rajshahi University of Engineering and Technology. Active member of <strong style="color:var(--amber)">Team ElectroKnights</strong> — designing systems where hardware meets intelligent control.
+    </p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn-primary">View Projects</a>
+      <a href="#contact" class="btn-secondary">Get in Touch</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <canvas id="circuit-canvas" width="420" height="420"></canvas>
+  </div>
+</section>
+</div>
+
+<!-- SKILLS -->
+<section id="skills">
+  <p class="section-label">capabilities</p>
+  <h2 class="section-title">Technical Stack</h2>
+  <div class="skills-grid">
+    <div class="skill-card">
+      <div class="skill-card-head">
+        <span class="skill-icon">⚙️</span>
+        <span class="skill-cat">Embedded &amp; Hardware</span>
+      </div>
+      <div class="skill-tags">
+        <span class="tag">Arduino Nano</span>
+        <span class="tag">Microcontrollers</span>
+        <span class="tag">Servo Control</span>
+        <span class="tag">Circuit Simulation</span>
+        <span class="tag">Multi-layer Filters</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-card-head">
+        <span class="skill-icon">📡</span>
+        <span class="skill-cat">Signal Processing</span>
+      </div>
+      <div class="skill-tags">
+        <span class="tag">MATLAB</span>
+        <span class="tag">Filter Design</span>
+        <span class="tag">Frequency Analysis</span>
+        <span class="tag">Telecommunications</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-card-head">
+        <span class="skill-icon">💻</span>
+        <span class="skill-cat">Software Engineering</span>
+      </div>
+      <div class="skill-tags">
+        <span class="tag">C++</span>
+        <span class="tag">Data Structures</span>
+        <span class="tag">Algorithms</span>
+        <span class="tag">Problem Solving</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-card-head">
+        <span class="skill-icon">🤖</span>
+        <span class="skill-cat">Robotics</span>
+      </div>
+      <div class="skill-tags">
+        <span class="tag">4-DOF Arms</span>
+        <span class="tag">Kinematics</span>
+        <span class="tag">MG90S Servos</span>
+        <span class="tag">Mechanical Design</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <p class="section-label">work</p>
+  <h2 class="section-title">Featured Projects</h2>
+  <div class="projects-grid">
+    <div class="project-card">
+      <p class="project-type">Robotics · Team ElectroKnights</p>
+      <h3 class="project-name">4-DOF Mini Robotic Arm</h3>
+      <p class="project-desc">
+        Designed and built a four-degree-of-freedom robotic arm model capable of articulated pick-and-place operations. Programmed servo sequencing and joint-angle control logic on Arduino Nano.
+      </p>
+      <div class="project-stack">
+        <span class="stack-pill">Arduino Nano</span>
+        <span class="stack-pill">MG90S Servos</span>
+        <span class="stack-pill">C++</span>
+        <span class="stack-pill">PWM Control</span>
+      </div>
+    </div>
+    <div class="project-card">
+      <p class="project-type">Signal Processing · Academic</p>
+      <h3 class="project-name">Multi-Layer Electronic Filter Design</h3>
+      <p class="project-desc">
+        Designed and simulated cascaded electronic filter models — low-pass, high-pass, and band-pass configurations — derived from personal academic parameters. Verified response curves in MATLAB and simulation tools.
+      </p>
+      <div class="project-stack">
+        <span class="stack-pill">MATLAB</span>
+        <span class="stack-pill">Circuit Sim</span>
+        <span class="stack-pill">Filter Theory</span>
+        <span class="stack-pill">Frequency Domain</span>
+      </div>
+    </div>
+    <div class="project-card">
+      <p class="project-type">Software · Competitive Programming</p>
+      <h3 class="project-name">DSA Problem Solving</h3>
+      <p class="project-desc">
+        Actively practising data structures and algorithm challenges in C++. Focus areas include graph traversal, dynamic programming, and time-complexity optimization for engineering problem sets.
+      </p>
+      <div class="project-stack">
+        <span class="stack-pill">C++</span>
+        <span class="stack-pill">Graph Algorithms</span>
+        <span class="stack-pill">Dynamic Programming</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <p class="section-label">background</p>
+  <h2 class="section-title">About</h2>
+  <div class="about-layout">
+    <div class="about-text">
+      <p>
+        I'm an <strong>Electronics and Telecommunication Engineering</strong> student at Rajshahi University of Engineering and Technology (RUET), currently based between Dhaka and Rajshahi, Bangladesh.
+      </p>
+      <p>
+        My work sits at the intersection of <strong>embedded hardware and intelligent control</strong> — I'm most energized when a circuit I designed actually drives something physical. As an active technical member of <strong>Team ElectroKnights</strong>, I contribute to competitive robotics builds and hands-on system integration.
+      </p>
+      <p>
+        On the software side, I sharpen my fundamentals through <strong>C++ and DSA</strong>, while my academic work in signal processing and telecommunications gives me a solid analytical foundation for complex engineering problems.
+      </p>
+    </div>
+    <div class="stats-panel">
+      <div class="stat-box">
+        <span class="stat-val">4-DOF</span>
+        <span class="stat-lbl">Robotic Arm Built</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-val">ETE</span>
+        <span class="stat-lbl">Specialization</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-val">RUET</span>
+        <span class="stat-lbl">University</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-val">C++</span>
+        <span class="stat-lbl">Primary Language</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <p class="section-label">connect</p>
+    <h2 class="section-title">Get in Touch</h2>
+    <p class="contact-prompt">
+      Open to internships, research collaborations, and embedded engineering opportunities.<br>
+      Reach out via <code>email</code> or find me on professional networks.
+    </p>
+    <div class="contact-links">
+      <a href="mailto:your@email.com" class="btn-primary">Send Email</a>
+      <a href="https://linkedin.com" class="btn-secondary">LinkedIn</a>
+      <a href="https://github.com" class="btn-secondary">GitHub</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  © 2026 · Built with intention · RUET ETE · Dhaka / Rajshahi, Bangladesh
+</footer>
+
+<script>
+// ── CIRCUIT ANIMATION ──
+const canvas = document.getElementById('circuit-canvas');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+const GREEN = '#00FF9C';
+const AMBER = '#FFB347';
+const DIM   = 'rgba(0,255,156,0.12)';
+
+// Grid nodes
+const COLS = 9, ROWS = 9;
+const STEP = W / (COLS + 1);
+const nodes = [];
+for (let r = 0; r <= ROWS; r++) {
+  for (let c = 0; c <= COLS; c++) {
+    nodes.push({ x: (c + 0.5) * STEP, y: (r + 0.5) * STEP });
+  }
+}
+
+// Edges (horizontal + vertical)
+const edges = [];
+for (let r = 0; r <= ROWS; r++) {
+  for (let c = 0; c < COLS; c++) {
+    const a = r*(COLS+1)+c, b = a+1;
+    edges.push({ a, b, lit: 0, phase: Math.random()*Math.PI*2 });
+  }
+}
+for (let r = 0; r < ROWS; r++) {
+  for (let c = 0; c <= COLS; c++) {
+    const a = r*(COLS+1)+c, b = a+(COLS+1);
+    edges.push({ a, b, lit: 0, phase: Math.random()*Math.PI*2 });
+  }
+}
+
+// Pulse trains
+const pulses = [];
+function spawnPulse() {
+  const e = edges[Math.floor(Math.random()*edges.length)];
+  pulses.push({ edge: e, t: 0, speed: 0.012 + Math.random()*0.018 });
+}
+for (let i = 0; i < 12; i++) spawnPulse();
+
+// Special nodes (components)
+const compNodes = [
+  nodes[Math.floor(ROWS/2)*(COLS+1)+Math.floor(COLS/2)],
+  nodes[2*(COLS+1)+2],
+  nodes[7*(COLS+1)+7],
+  nodes[2*(COLS+1)+7],
+  nodes[7*(COLS+1)+2],
+];
+
+let tick = 0;
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Background grid lines (very dim)
+  ctx.strokeStyle = DIM;
+  ctx.lineWidth = 0.5;
+  edges.forEach(e => {
+    const na = nodes[e.a], nb = nodes[e.b];
+    ctx.beginPath(); ctx.moveTo(na.x, na.y); ctx.lineTo(nb.x, nb.y); ctx.stroke();
+  });
+
+  // Lit edges (pulsing)
+  edges.forEach(e => {
+    const brightness = 0.18 + 0.12 * Math.sin(tick * 0.03 + e.phase);
+    if (e.lit > 0) {
+      ctx.strokeStyle = `rgba(0,255,156,${brightness + e.lit * 0.5})`;
+      ctx.lineWidth = 1 + e.lit;
+      const na = nodes[e.a], nb = nodes[e.b];
+      ctx.beginPath(); ctx.moveTo(na.x, na.y); ctx.lineTo(nb.x, nb.y); ctx.stroke();
+      e.lit *= 0.96;
+    }
+  });
+
+  // Pulses
+  pulses.forEach((p, i) => {
+    p.t += p.speed;
+    const na = nodes[p.edge.a], nb = nodes[p.edge.b];
+    const px = na.x + (nb.x - na.x) * p.t;
+    const py = na.y + (nb.y - na.y) * p.t;
+
+    // Glow dot
+    const g = ctx.createRadialGradient(px, py, 0, px, py, 7);
+    g.addColorStop(0, 'rgba(0,255,156,0.9)');
+    g.addColorStop(1, 'rgba(0,255,156,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(px, py, 7, 0, Math.PI*2); ctx.fill();
+
+    // Bright core
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath(); ctx.arc(px, py, 1.8, 0, Math.PI*2); ctx.fill();
+
+    p.edge.lit = Math.min(p.edge.lit + 0.4, 1);
+
+    if (p.t >= 1) {
+      pulses.splice(i, 1);
+      spawnPulse();
+      // Spawn branch pulses
+      if (Math.random() < 0.5) spawnPulse();
+    }
+  });
+
+  // Component nodes
+  compNodes.forEach((n, i) => {
+    const pulse = 0.7 + 0.3 * Math.sin(tick * 0.04 + i * 1.3);
+    // Outer ring
+    ctx.strokeStyle = `rgba(0,255,156,${0.3 * pulse})`;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(n.x, n.y, 10, 0, Math.PI*2); ctx.stroke();
+    // Inner dot
+    ctx.fillStyle = i === 0 ? AMBER : GREEN;
+    ctx.globalAlpha = pulse;
+    ctx.beginPath(); ctx.arc(n.x, n.y, 4, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 1;
+  });
+
+  // Center label
+  const cn = compNodes[0];
+  ctx.font = `12px 'Share Tech Mono', monospace`;
+  ctx.fillStyle = 'rgba(0,255,156,0.55)';
+  ctx.textAlign = 'center';
+  ctx.fillText('EK_ARM_v1', cn.x, cn.y + 28);
+
+  tick++;
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>

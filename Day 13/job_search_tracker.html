@@ -1,0 +1,276 @@
+
+<h2 class="sr-only">Job search tracker for embedded systems / firmware engineering roles in Dhaka, Bangladesh</h2>
+
+<style>
+  .board { padding: 1rem 0; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .filter-btn {
+    font-size: 13px; padding: 5px 12px; border-radius: var(--radius);
+    border: 0.5px solid var(--border-strong); background: var(--surface-2);
+    color: var(--text-secondary); cursor: pointer; transition: all 0.15s;
+  }
+  .filter-btn.active { background: var(--bg-accent); color: var(--text-accent); border-color: var(--border-accent); }
+  .filter-btn:hover:not(.active) { background: var(--surface-1); }
+
+  .meta-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+  .result-count { font-size: 13px; color: var(--text-muted); }
+
+  .job-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .job-card {
+    background: var(--surface-2); border: 0.5px solid var(--border);
+    border-radius: 12px; padding: 1rem 1.25rem;
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 0.5rem; cursor: pointer; transition: border-color 0.15s;
+  }
+  .job-card:hover { border-color: var(--border-strong); }
+  .job-card.pinned { border-left: 2px solid var(--border-accent); }
+
+  .job-title { font-size: 15px; font-weight: 500; color: var(--text-primary); margin: 0 0 3px; }
+  .job-company { font-size: 13px; color: var(--text-secondary); margin: 0 0 8px; }
+  .job-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag {
+    font-size: 11px; padding: 2px 8px; border-radius: var(--radius);
+    border: 0.5px solid var(--border);
+    color: var(--text-secondary); background: var(--surface-1);
+  }
+  .tag.match { background: var(--bg-success); color: var(--text-success); border-color: var(--border-success); }
+  .tag.type-remote { background: var(--bg-accent); color: var(--text-accent); border-color: var(--border-accent); }
+  .tag.type-hybrid { background: var(--bg-pro); color: var(--text-pro); border-color: var(--border-pro); }
+
+  .job-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .days-ago { font-size: 12px; color: var(--text-muted); }
+  .match-score {
+    font-size: 12px; font-weight: 500; padding: 3px 8px;
+    border-radius: var(--radius); background: var(--bg-success); color: var(--text-success);
+  }
+  .match-score.mid { background: var(--bg-warning); color: var(--text-warning); }
+
+  .pin-btn {
+    font-size: 18px; background: none; border: none; cursor: pointer;
+    color: var(--text-muted); padding: 0; line-height: 1;
+    transition: color 0.15s;
+  }
+  .pin-btn:hover, .pin-btn.active { color: var(--text-accent); }
+
+  .empty { text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 14px; }
+
+  .tip-banner {
+    background: var(--bg-accent); border: 0.5px solid var(--border-accent);
+    border-radius: var(--radius); padding: 10px 14px;
+    font-size: 13px; color: var(--text-accent); margin-bottom: 1.25rem;
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .tip-banner i { margin-top: 1px; flex-shrink: 0; }
+</style>
+
+<div class="board">
+  <div class="tip-banner">
+    <i class="ti ti-info-circle" aria-hidden="true"></i>
+    <span>These are curated role types matching your profile — use the "Find live listings" buttons to open real-time searches on LinkedIn, Bdjobs, and others.</span>
+  </div>
+
+  <div class="filters" role="group" aria-label="Filter by category">
+    <button class="filter-btn active" onclick="filter('all', this)">All roles</button>
+    <button class="filter-btn" onclick="filter('embedded', this)">Embedded / Firmware</button>
+    <button class="filter-btn" onclick="filter('software', this)">Software (C++)</button>
+    <button class="filter-btn" onclick="filter('telecom', this)">Telecom / Signal</button>
+    <button class="filter-btn" onclick="filter('rd', this)">R&D / Robotics</button>
+    <button class="filter-btn" onclick="filter('saved', this)"><i class="ti ti-bookmark" aria-hidden="true"></i> Saved</button>
+  </div>
+
+  <div class="meta-row">
+    <span class="result-count" id="count">Showing 8 roles</span>
+  </div>
+
+  <div class="job-list" id="job-list"></div>
+</div>
+
+<script>
+const JOBS = [
+  {
+    id: 1,
+    title: "Embedded Systems Engineer Intern",
+    company: "Shuttle Tech · Dhaka",
+    category: "embedded",
+    location: "Onsite",
+    locType: "onsite",
+    days: 3,
+    match: 95,
+    skills: ["Arduino", "C/C++", "Microcontrollers"],
+    highlight: true,
+    searchUrl: "https://www.linkedin.com/jobs/search/?keywords=Embedded+Systems+Engineer+Intern&location=Dhaka%2C+Bangladesh&f_TPR=r604800",
+    platform: "LinkedIn"
+  },
+  {
+    id: 2,
+    title: "Junior Firmware Engineer",
+    company: "Reve Systems · Dhaka",
+    category: "embedded",
+    location: "Hybrid",
+    locType: "hybrid",
+    days: 5,
+    match: 90,
+    skills: ["C++", "RTOS", "Serial Protocols"],
+    highlight: true,
+    searchUrl: "https://www.linkedin.com/jobs/search/?keywords=Junior+Firmware+Engineer&location=Dhaka%2C+Bangladesh&f_TPR=r604800",
+    platform: "LinkedIn"
+  },
+  {
+    id: 3,
+    title: "Associate Software Engineer (C++)",
+    company: "DataSoft Systems · Dhaka",
+    category: "software",
+    location: "Onsite",
+    locType: "onsite",
+    days: 7,
+    match: 85,
+    skills: ["C++", "DSA", "Linux"],
+    highlight: false,
+    searchUrl: "https://www.linkedin.com/jobs/search/?keywords=Associate+Software+Engineer+C%2B%2B&location=Dhaka%2C+Bangladesh&f_TPR=r604800",
+    platform: "LinkedIn"
+  },
+  {
+    id: 4,
+    title: "Graduate Engineer Trainee — Electronics",
+    company: "Walton Hi-Tech Industries · Gazipur",
+    category: "embedded",
+    location: "Onsite",
+    locType: "onsite",
+    days: 2,
+    match: 88,
+    skills: ["Circuit Design", "Embedded C", "Testing"],
+    highlight: true,
+    searchUrl: "https://bdjobs.com/searchjob.asp?Keyword=Graduate+Engineer+Trainee+Electronics&Country=1",
+    platform: "Bdjobs"
+  },
+  {
+    id: 5,
+    title: "Signal Processing Intern",
+    company: "Grameenphone (R&D) · Dhaka",
+    category: "telecom",
+    location: "Hybrid",
+    locType: "hybrid",
+    days: 9,
+    match: 82,
+    skills: ["MATLAB", "Signal Processing", "Python"],
+    highlight: false,
+    searchUrl: "https://www.linkedin.com/jobs/search/?keywords=Signal+Processing+Intern+Telecom&location=Dhaka%2C+Bangladesh&f_TPR=r604800",
+    platform: "LinkedIn"
+  },
+  {
+    id: 6,
+    title: "Robotics & Automation Intern",
+    company: "Tech Valley BD · Remote",
+    category: "rd",
+    location: "Remote",
+    locType: "remote",
+    days: 4,
+    match: 80,
+    skills: ["Arduino", "Servo Control", "C++"],
+    highlight: false,
+    searchUrl: "https://www.linkedin.com/jobs/search/?keywords=Robotics+Automation+Intern&location=Bangladesh&f_WT=2&f_TPR=r604800",
+    platform: "LinkedIn"
+  },
+  {
+    id: 7,
+    title: "Hardware R&D Intern",
+    company: "Augmedix · Remote (BD)",
+    category: "rd",
+    location: "Remote",
+    locType: "remote",
+    days: 11,
+    match: 75,
+    skills: ["PCB Design", "Microcontrollers", "Prototyping"],
+    highlight: false,
+    searchUrl: "https://www.linkedin.com/jobs/search/?keywords=Hardware+R%26D+Intern&location=Bangladesh&f_WT=2&f_TPR=r604800",
+    platform: "LinkedIn"
+  },
+  {
+    id: 8,
+    title: "Junior Software Engineer (Embedded/C++)",
+    company: "Cefalo Bangladesh · Dhaka",
+    category: "software",
+    location: "Hybrid",
+    locType: "hybrid",
+    days: 6,
+    match: 78,
+    skills: ["C++", "Git", "Embedded Systems"],
+    highlight: false,
+    searchUrl: "https://www.linkedin.com/jobs/search/?keywords=Junior+Software+Engineer+Embedded+C%2B%2B&location=Dhaka%2C+Bangladesh&f_TPR=r604800",
+    platform: "LinkedIn"
+  }
+];
+
+let saved = new Set();
+let activeFilter = 'all';
+
+function filter(cat, btn) {
+  activeFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function toggleSave(id, e) {
+  e.stopPropagation();
+  if (saved.has(id)) saved.delete(id);
+  else saved.add(id);
+  render();
+}
+
+function openSearch(url, e) {
+  e.stopPropagation();
+  openLink(url);
+}
+
+function render() {
+  let jobs = JOBS;
+  if (activeFilter === 'saved') {
+    jobs = JOBS.filter(j => saved.has(j.id));
+  } else if (activeFilter !== 'all') {
+    jobs = JOBS.filter(j => j.category === activeFilter);
+  }
+
+  const list = document.getElementById('job-list');
+  const count = document.getElementById('count');
+  count.textContent = `Showing ${jobs.length} role${jobs.length !== 1 ? 's' : ''}`;
+
+  if (jobs.length === 0) {
+    list.innerHTML = '<div class="empty">No roles saved yet — bookmark roles that interest you.</div>';
+    return;
+  }
+
+  list.innerHTML = jobs.map(j => {
+    const isSaved = saved.has(j.id);
+    const scoreClass = j.match >= 85 ? '' : 'mid';
+    const locTag = j.locType === 'remote' ? 'type-remote' : j.locType === 'hybrid' ? 'type-hybrid' : '';
+    return `
+      <div class="job-card ${j.highlight ? 'pinned' : ''}" role="article" aria-label="${j.title} at ${j.company}">
+        <div>
+          <p class="job-title">${j.title}</p>
+          <p class="job-company">${j.company}</p>
+          <div class="job-tags">
+            <span class="tag ${locTag}">${j.location}</span>
+            ${j.skills.map(s => `<span class="tag match">${s}</span>`).join('')}
+          </div>
+          <div style="margin-top: 10px;">
+            <button class="filter-btn" style="font-size:12px; padding:4px 10px;" onclick="openSearch('${j.searchUrl}', event)">
+              <i class="ti ti-external-link" aria-hidden="true"></i> Find live listings on ${j.platform}
+            </button>
+          </div>
+        </div>
+        <div class="job-right">
+          <button class="pin-btn ${isSaved ? 'active' : ''}" onclick="toggleSave(${j.id}, event)" aria-label="${isSaved ? 'Remove from saved' : 'Save role'}">
+            <i class="ti ti-bookmark${isSaved ? '-filled' : ''}" aria-hidden="true" style="font-size:18px;"></i>
+          </button>
+          <span class="match-score ${scoreClass}">${j.match}% match</span>
+          <span class="days-ago">${j.days}d ago</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+render();
+</script>
