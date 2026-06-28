@@ -1,0 +1,182 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.wrap { padding: 1.5rem 0; }
+.score-section { display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem; padding: 1.25rem 1.5rem; background: var(--surface-1); border-radius: 12px; border: 0.5px solid var(--border); }
+.score-ring { position: relative; width: 100px; height: 100px; flex-shrink: 0; }
+.score-ring svg { transform: rotate(-90deg); }
+.score-num { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.score-num span:first-child { font-size: 26px; font-weight: 500; color: #e24b4a; }
+.score-num span:last-child { font-size: 11px; color: var(--text-muted); }
+.score-meta h2 { font-size: 18px; font-weight: 500; color: var(--text-primary); margin-bottom: 4px; }
+.score-meta p { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+.verdict { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 5px 12px; border-radius: var(--radius); background: #fcebeb; color: #a32d2d; font-size: 13px; font-weight: 500; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.card { background: var(--surface-2); border-radius: 12px; border: 0.5px solid var(--border); padding: 1rem 1.25rem; }
+.card h3 { font-size: 13px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 12px; }
+.flag-item { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; }
+.sev { flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; }
+.sev.high { background: #fcebeb; color: #a32d2d; }
+.sev.med { background: #faeeda; color: #854f0b; }
+.flag-text { font-size: 13px; color: var(--text-primary); line-height: 1.5; }
+.flag-label { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+.pos-item { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; font-size: 13px; color: var(--text-primary); line-height: 1.5; }
+.pos-item i { color: #3b6d11; font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+.risk-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.risk-table td { padding: 8px 0; border-bottom: 0.5px solid var(--border); color: var(--text-primary); }
+.risk-table tr:last-child td { border-bottom: none; }
+.risk-table td:first-child { color: var(--text-secondary); width: 120px; }
+.pill { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+.pill.red { background: #fcebeb; color: #a32d2d; }
+.pill.amber { background: #faeeda; color: #854f0b; }
+.pill.green { background: #eaf3de; color: #3b6d11; }
+.pill.gray { background: var(--surface-1); color: var(--text-secondary); border: 0.5px solid var(--border); }
+.q-item { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; font-size: 13px; line-height: 1.6; color: var(--text-primary); }
+.q-num { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; background: var(--bg-accent); color: var(--text-accent); font-size: 11px; font-weight: 500; display: flex; align-items: center; justify-content: center; }
+.bar-wrap { margin-bottom: 6px; }
+.bar-track { height: 6px; background: var(--surface-1); border-radius: 3px; border: 0.5px solid var(--border); overflow: hidden; margin-top: 4px; }
+.bar-fill { height: 100%; border-radius: 3px; }
+.section-title { font-size: 16px; font-weight: 500; color: var(--text-primary); margin: 1.5rem 0 0.75rem; }
+</style>
+
+<h2 class="sr-only">AI Red Flag Detector analysis of ApexLaunch Technologies mid-level full-stack engineer job posting. Overall risk score: 72 out of 100. Verdict: Apply with caution.</h2>
+
+<div class="wrap">
+
+<div class="score-section">
+  <div class="score-ring">
+    <svg width="100" height="100" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="40" fill="none" stroke="#e1e0d9" stroke-width="10"/>
+      <circle cx="50" cy="50" r="40" fill="none" stroke="#e24b4a" stroke-width="10"
+        stroke-dasharray="251.2" stroke-dashoffset="70.3" stroke-linecap="round"/>
+    </svg>
+    <div class="score-num">
+      <span>72</span>
+      <span>/ 100</span>
+    </div>
+  </div>
+  <div class="score-meta">
+    <h2>Overall risk score — high</h2>
+    <p>This posting carries several compounding red flags: hustle culture language, ambiguous remote policy, 24/7 on-call, missing salary data, and a very young company with mixed Glassdoor reviews.</p>
+    <div class="verdict"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Apply with caution</div>
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <h3>Top red flags</h3>
+
+    <div class="flag-item">
+      <div class="sev high">9</div>
+      <div>
+        <div class="flag-text">24/7 on-call rotation for a mid-level role</div>
+        <div class="flag-label">Culture / Requirements</div>
+      </div>
+    </div>
+    <div class="flag-item">
+      <div class="sev high">8</div>
+      <div>
+        <div class="flag-text">"Rockstar," "hustle mentality," "thrive under pressure" — explicit burnout culture signals</div>
+        <div class="flag-label">Culture</div>
+      </div>
+    </div>
+    <div class="flag-item">
+      <div class="sev high">8</div>
+      <div>
+        <div class="flag-text">No salary range disclosed despite equity and bonuses mentioned</div>
+        <div class="flag-label">Hiring</div>
+      </div>
+    </div>
+    <div class="flag-item">
+      <div class="sev high">8</div>
+      <div>
+        <div class="flag-text">Refactor legacy systems AND ship weekly features — contradictory demands</div>
+        <div class="flag-label">Requirements</div>
+      </div>
+    </div>
+    <div class="flag-item">
+      <div class="sev med">7</div>
+      <div>
+        <div class="flag-text">"Remote (Global)" but core hours fixed to US EST — meaningful timezone constraint</div>
+        <div class="flag-label">Remote authenticity</div>
+      </div>
+    </div>
+    <div class="flag-item">
+      <div class="sev med">7</div>
+      <div>
+        <div class="flag-text">Full-stack + DevOps (AWS, CI/CD) + on-call + refactoring — scope creep for a mid-level hire</div>
+        <div class="flag-label">Requirements</div>
+      </div>
+    </div>
+    <div class="flag-item">
+      <div class="sev med">6</div>
+      <div>
+        <div class="flag-text">Glassdoor 3.2/5 with recurring mentions of extended hours and roadmap whiplash</div>
+        <div class="flag-label">Company</div>
+      </div>
+    </div>
+    <div class="flag-item">
+      <div class="sev med">6</div>
+      <div>
+        <div class="flag-text">Founded 2024, 45 employees — stability risk and product-market fit unproven</div>
+        <div class="flag-label">Company</div>
+      </div>
+    </div>
+    <div class="flag-item">
+      <div class="sev med">5</div>
+      <div>
+        <div class="flag-text">"Unlimited PTO" at a high-pressure startup — often means no PTO in practice</div>
+        <div class="flag-label">Culture</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Positive signals</h3>
+    <div class="pos-item"><i class="ti ti-check" aria-hidden="true"></i>Series A funded ($12M) from tier-1 VCs — genuine runway exists</div>
+    <div class="pos-item"><i class="ti ti-check" aria-hidden="true"></i>Rapid headcount growth signals real business momentum</div>
+    <div class="pos-item"><i class="ti ti-check" aria-hidden="true"></i>Serial-entrepreneur founders with prior successful exits</div>
+    <div class="pos-item"><i class="ti ti-check" aria-hidden="true"></i>Equity package offered — upside potential if company succeeds</div>
+    <div class="pos-item"><i class="ti ti-check" aria-hidden="true"></i>Exciting technical domain (generative AI + enterprise automation)</div>
+    <div class="pos-item"><i class="ti ti-check" aria-hidden="true"></i>Modern, in-demand tech stack (React, Node.js, TypeScript, AWS)</div>
+    <div class="pos-item"><i class="ti ti-check" aria-hidden="true"></i>Performance-based bonuses alongside equity</div>
+    <div class="pos-item"><i class="ti ti-check" aria-hidden="true"></i>Glassdoor reviewers acknowledge exciting technology (not all doom)</div>
+    <div style="height:1px; background: var(--border); margin: 12px 0;"></div>
+    <h3>Risk breakdown</h3>
+    <table class="risk-table" aria-label="Risk breakdown by category">
+      <tr><td>Requirements</td><td><span class="pill red">High</span></td></tr>
+      <tr><td>Culture</td><td><span class="pill red">High</span></td></tr>
+      <tr><td>Remote</td><td><span class="pill amber">Medium</span></td></tr>
+      <tr><td>Hiring</td><td><span class="pill red">High</span></td></tr>
+      <tr><td>Company</td><td><span class="pill amber">Medium</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom: 1rem;">
+  <h3>5 smart interview questions</h3>
+  <div style="height: 8px;"></div>
+  <div class="q-item">
+    <div class="q-num">1</div>
+    <div><strong style="font-weight:500;">On-call specifics:</strong> "Can you walk me through what a typical on-call incident looks like — how often are engineers paged outside business hours, and what's the average time to resolution?" <span style="color: var(--text-muted);">— validates whether 24/7 truly means nights and weekends.</span></div>
+  </div>
+  <div class="q-item">
+    <div class="q-num">2</div>
+    <div><strong style="font-weight:500;">Compensation range:</strong> "What's the budgeted base salary range for this role, and how is the equity structured in terms of strike price, cliff, and vesting schedule?" <span style="color: var(--text-muted);">— forces disclosure of the missing salary data.</span></div>
+  </div>
+  <div class="q-item">
+    <div class="q-num">3</div>
+    <div><strong style="font-weight:500;">PTO reality check:</strong> "How much time off did engineers on this team actually take in the last 12 months? Is there a minimum encouraged?" <span style="color: var(--text-muted);">— exposes whether unlimited PTO is real or performative.</span></div>
+  </div>
+  <div class="q-item">
+    <div class="q-num">4</div>
+    <div><strong style="font-weight:500;">Roadmap stability:</strong> "Glassdoor mentions frequent priority shifts. How do you balance investor milestone pressure with protecting engineering throughput and avoiding burnout?" <span style="color: var(--text-muted);">— surfaces leadership's self-awareness on the culture issue.</span></div>
+  </div>
+  <div class="q-item">
+    <div class="q-num">5</div>
+    <div><strong style="font-weight:500;">Scope clarity:</strong> "The JD mentions both refactoring legacy systems and shipping new features weekly. How does the team prioritize when those goals conflict, and who makes the final call?" <span style="color: var(--text-muted);">— probes whether management understands the contradiction it created.</span></div>
+  </div>
+</div>
+
+</div>
