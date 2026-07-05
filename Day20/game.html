@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoFace // Interactive Neural Puzzle Matrix</title>
+    <!-- Tailwind CSS for utility structural layouts -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Google Fonts for Cyberpunk Aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti for Win State Animation -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        .cyber-title {
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 10px rgba(6, 182, 212, 0.6), 0 0 20px rgba(6, 182, 212, 0.3);
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(6, 182, 212, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .neon-glow-cyan {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+        }
+        .neon-glow-emerald {
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+        }
+        .puzzle-node {
+            transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s ease;
+            touch-action: none;
+            cursor: grab;
+        }
+        .puzzle-node:active {
+            cursor: grabbing;
+        }
+        .puzzle-node.dragging {
+            opacity: 0.85;
+            transform: scale(1.05);
+            z-index: 50;
+            box-shadow: 0 0 25px rgba(236, 72, 153, 0.8) !important;
+            border-color: #ec4899 !important;
+        }
+        .puzzle-node.correct-slot {
+            border: 2px solid #10b981 !important;
+            box-shadow: inset 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+        .puzzle-node.incorrect-slot {
+            border: 2px solid rgba(6, 182, 212, 0.4);
+        }
+        /* Custom scrollbar for leaderboard */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(6, 182, 212, 0.3);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(6, 182, 212, 0.6);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-4 md:p-8">
+
+    <!-- Header Section -->
+    <header class="w-full max-w-5xl flex flex-col sm:flex-row items-center justify-between border-b border-cyan-500/20 pb-4 mb-6">
+        <div class="text-center sm:text-left mb-4 sm:mb-0">
+            <h1 class="text-2xl md:text-3xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-500 cyber-title">
+                CHRONOFACE //
+            </h1>
+            <p class="text-xs tracking-widest text-cyan-400/70 font-semibold uppercase">Neural Dynamic Reconstruction Interface</p>
+        </div>
+        <!-- Live Stats Dashboard -->
+        <div id="gameStatsBar" class="hidden flex items-center gap-4 text-sm font-bold">
+            <div class="glass-panel px-4 py-2 rounded-lg border border-cyan-500/30 flex flex-col items-center min-w-[90px]">
+                <span class="text-[10px] uppercase text-cyan-400/60 font-medium tracking-wider">Time Matrix</span>
+                <span id="liveTimer" class="font-mono text-cyan-400 text-lg">00:00.0</span>
+            </div>
+            <div class="glass-panel px-4 py-2 rounded-lg border border-fuchsia-500/30 flex flex-col items-center min-w-[90px]">
+                <span class="text-[10px] uppercase text-fuchsia-400/60 font-medium tracking-wider">Sync Shifts</span>
+                <span id="moveCounter" class="font-mono text-fuchsia-400 text-lg">0</span>
+            </div>
+            <div class="glass-panel px-4 py-2 rounded-lg border border-emerald-500/30 flex flex-col items-center min-w-[90px]">
+                <span class="text-[10px] uppercase text-emerald-400/60 font-medium tracking-wider">Alignment</span>
+                <span id="alignmentAccuracy" class="font-mono text-emerald-400 text-lg">0/0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dynamic Core Stage -->
+    <main class="w-full max-w-5xl flex-1 flex flex-col lg:flex-row items-center justify-center gap-8 class='mb-6'">
+        
+        <!-- Interactive Viewport Wrapper -->
+        <section id="viewportWrapper" class="w-full max-w-[480px] aspect-square glass-panel rounded-2xl overflow-hidden relative border-2 border-cyan-500/30 flex flex-col items-center justify-center p-2 group transition-all duration-300">
+            
+            <!-- Stage A: Active Camera Feed Stream -->
+            <div id="cameraStage" class="w-full h-full flex flex-col items-center justify-center relative">
+                <video id="webcamStream" autoplay playsinline class="w-full h-full object-cover rounded-xl scale-x-[-1] bg-slate-950"></video>
+                <div id="cameraOverlayFlash" class="absolute inset-0 bg-white opacity-0 pointer-events-none transition-opacity duration-150"></div>
+                <button id="captureTrigger" class="absolute bottom-6 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold tracking-wider shadow-lg neon-glow-cyan transition-all duration-200 uppercase text-sm border border-cyan-300/30">
+                    Capture Neural Frame
+                </button>
+            </div>
+
+            <!-- Stage B: Captured Matrix Configuration Setup -->
+            <div id="setupStage" class="hidden w-full h-full flex flex-col items-center justify-center p-6 text-center">
+                <h3 class="text-xl font-bold text-cyan-400 tracking-wide mb-2 uppercase">Neural Snapshot Locked</h3>
+                <p class="text-sm text-slate-400 mb-6">Select operational puzzle density parameters to segment visual sectors.</p>
+                
+                <div class="flex flex-col gap-3 w-full max-w-[280px]">
+                    <button data-density="3" class="density-selector-btn py-3 rounded-xl border border-cyan-500/40 bg-cyan-950/20 hover:bg-cyan-500/20 font-bold transition-all uppercase tracking-wider text-sm text-cyan-300">
+                        Low Density Grid (3×3)
+                    </button>
+                    <button data-density="4" class="density-selector-btn py-3 rounded-xl border border-fuchsia-500/40 bg-fuchsia-950/20 hover:bg-fuchsia-500/20 font-bold transition-all uppercase tracking-wider text-sm text-fuchsia-300">
+                        Medium Density Grid (4×4)
+                    </button>
+                    <button data-density="5" class="density-selector-btn py-3 rounded-xl border border-emerald-500/40 bg-emerald-950/20 hover:bg-emerald-500/20 font-bold transition-all uppercase tracking-wider text-sm text-emerald-300">
+                        High Density Grid (5×5)
+                    </button>
+                </div>
+
+                <button id="retakeTrigger" class="mt-8 text-xs font-bold text-slate-400 hover:text-rose-400 uppercase tracking-widest transition-colors flex items-center gap-1">
+                    ✕ Discard & Retake Frame
+                </button>
+            </div>
+
+            <!-- Stage C: Active Matrix Puzzle Game Board -->
+            <div id="puzzleStage" class="hidden w-full h-full relative">
+                <div id="puzzleMatrixContainer" class="w-full h-full grid gap-[2px] bg-slate-950 p-[2px] rounded-xl relative select-none"></div>
+            </div>
+        </section>
+
+        <!-- Right Side Sidebar: Instructions, Fallbacks, and Persistent Leaderboard -->
+        <section class="w-full max-w-[380px] flex flex-col gap-6">
+            
+            <!-- Dynamic Auxiliary Controls Panel -->
+            <div id="auxiliaryControls" class="hidden glass-panel p-4 rounded-xl border border-cyan-500/20 flex justify-center gap-3">
+                <button id="abortResetTrigger" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold uppercase tracking-wider text-slate-300 transition-colors">
+                    New Snapshot
+                </button>
+                <button id="re-shuffleTrigger" class="px-4 py-2 rounded-lg bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/40 text-xs font-bold uppercase tracking-wider text-cyan-400 transition-colors">
+                    Re-scramble Matrix
+                </button>
+            </div>
+
+            <!-- Notification Log Panel -->
+            <div id="systemLogPanel" class="glass-panel p-4 rounded-xl border border-cyan-500/20 text-xs font-mono text-cyan-400/80">
+                <div class="flex items-center gap-2 mb-2 text-cyan-400 font-bold tracking-wider uppercase text-[10px]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></span> Terminal Log Feedback
+                </div>
+                <p id="terminalLogMessage" class="leading-relaxed">System loaded. Ready for bio-metric hardware configuration sequence.</p>
+            </div>
+
+            <!-- Local Core High Scores Matrix Leaderboard -->
+            <div class="glass-panel p-5 rounded-xl border border-slate-800 flex-1 flex flex-col min-h-[220px]">
+                <h2 class="text-sm font-bold tracking-widest uppercase text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-400 mb-3 flex items-center justify-between">
+                    <span>🏆 Global Grid High Scores</span>
+                    <span class="text-[10px] text-slate-500 font-mono normal-case font-normal">Local Storage Cache</span>
+                </h2>
+                <div class="overflow-y-auto flex-1 pr-1 text-xs" id="leaderboardViewport">
+                    <!-- Dynamic Entry Rows will build natively here -->
+                    <p class="text-center text-slate-500 py-6 italic font-medium">No system high records synced yet.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Layer D: Overlap Win Diagnostics Dashboard View -->
+    <section id="resultsDiagnosticOverlay" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="w-full max-w-md glass-panel rounded-2xl border-2 border-emerald-500/40 p-6 md:p-8 text-center relative neon-glow-emerald">
+            <h2 class="text-2xl font-black text-emerald-400 tracking-wider uppercase mb-1 font-mono cyber-title">System Calibrated</h2>
+            <p class="text-xs text-slate-400 tracking-widest uppercase mb-6 font-medium">Neural Fragment Convergence Confirmed</p>
+            
+            <!-- Score Breakdown Matrix Data -->
+            <div class="grid grid-cols-3 gap-2 mb-6">
+                <div class="bg-slate-900/80 border border-slate-800 p-3 rounded-xl flex flex-col items-center">
+                    <span class="text-[9px] uppercase tracking-wider text-slate-500 font-bold">Grid Matrix</span>
+                    <span id="finalMetricDensity" class="text-sm font-bold font-mono text-cyan-400 mt-1">4×4</span>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 p-3 rounded-xl flex flex-col items-center">
+                    <span class="text-[9px] uppercase tracking-wider text-slate-500 font-bold">Total Sync Time</span>
+                    <span id="finalMetricTime" class="text-sm font-bold font-mono text-fuchsia-400 mt-1">01:42.3</span>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 p-3 rounded-xl flex flex-col items-center">
+                    <span class="text-[9px] uppercase tracking-wider text-slate-500 font-bold">Move Shifts</span>
+                    <span id="finalMetricMoves" class="text-sm font-bold font-mono text-emerald-400 mt-1">45</span>
+                </div>
+            </div>
+
+            <div class="w-full border-t border-slate-800/80 pt-4 mb-6">
+                <p class="text-xs text-slate-500 text-left mb-2 uppercase tracking-wider font-bold">Performance Summary</p>
+                <p id="performanceDiagnosticsPhrase" class="text-sm text-slate-300 text-left leading-relaxed italic"></p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 w-full">
+                <button id="playAgainSamePhotoTrigger" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold tracking-wider text-xs uppercase transition-all">
+                    Reset Array (Same Photo)
+                </button>
+                <button id="completeSystemResetTrigger" class="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold tracking-wider text-xs uppercase transition-all">
+                    Initialize New Capture
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer System Status -->
+    <footer class="w-full max-w-5xl mt-6 pt-3 border-t border-slate-900 flex flex-col sm:flex-row justify-between text-[10px] tracking-widest text-slate-600 font-mono uppercase">
+        <span>Hardware Status: <span id="hardwareDiagnosticStatusText" class="text-amber-500 font-bold">Requesting Initialization</span></span>
+        <span class="mt-1 sm:mt-0">Core Engine V4.2.0-Alpha // 2026 UTC Engine</span>
+    </footer>
+
+    <!-- Native JavaScript Engine Architecture -->
+    <script>
+        // Audio Synthesis Context Manager for Immersive Interface Sounds
+        const AudioSynth = {
+            ctx: null,
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            },
+            playTick() {
+                this.init(); if (!this.ctx) return;
+                let osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+                osc.type = 'sine'; osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+                gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.05);
+            },
+            playSnap() {
+                this.init(); if (!this.ctx) return;
+                let osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(180, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.15);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.15);
+            },
+            playCorrect() {
+                this.init(); if (!this.ctx) return;
+                let now = this.ctx.currentTime;
+                [440, 554, 659].forEach((f, i) => {
+                    let osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+                    osc.frequency.setValueAtTime(f, now + (i * 0.04));
+                    gain.gain.setValueAtTime(0.05, now + (i * 0.04));
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + (i * 0.04) + 0.12);
+                    osc.connect(gain); gain.connect(this.ctx.destination);
+                    osc.start(now + (i * 0.04)); osc.stop(now + (i * 0.04) + 0.12);
+                });
+            },
+            playSuccessCascade() {
+                this.init(); if (!this.ctx) return;
+                let now = this.ctx.currentTime;
+                [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+                    let osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+                    osc.type = 'sine'; osc.frequency.setValueAtTime(f, now + (i * 0.08));
+                    gain.gain.setValueAtTime(0.08, now + (i * 0.08));
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + (i * 0.08) + 0.3);
+                    osc.connect(gain); gain.connect(this.ctx.destination);
+                    osc.start(now + (i * 0.08)); osc.stop(now + (i * 0.08) + 0.3);
+                });
+            }
+        };
+
+        // System Constants & Elements Dom References
+        const video = document.getElementById('webcamStream');
+        const cameraStage = document.getElementById('cameraStage');
+        const setupStage = document.getElementById('setupStage');
+        const puzzleStage = document.getElementById('puzzleStage');
+        const puzzleContainer = document.getElementById('puzzleMatrixContainer');
+        const liveTimer = document.getElementById('liveTimer');
+        const moveCounterElem = document.getElementById('moveCounter');
+        const accuracyElem = document.getElementById('alignmentAccuracy');
+        const statsBar = document.getElementById('gameStatsBar');
+        const auxControls = document.getElementById('auxiliaryControls');
+        const terminalLog = document.getElementById('terminalLogMessage');
+        const hwStatus = document.getElementById('hardwareDiagnosticStatusText');
+
+        // Dynamic State Registers
+        let rawStreamRef = null;
+        let frozenImageCanvas = null;
+        let puzzleGridDensity = 3; 
+        let matrixArrays = []; 
+        let moveCount = 0;
+        let puzzleActive = false;
+        
+        // Accurate Frame Rate Time Matrix Keepers
+        let chronometerStart = 0;
+        let chronometerElapsed = 0;
+        let chronometerIntervalRef = null;
+
+        // Web Touch Event Cache Trackers
+        let activeDraggedNode = null;
+
+        // Initialize Hardware Communication Sub-system
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeHardwareStream();
+            renderSavedLeaderboard();
+            bindCoreInterfaceTriggers();
+        });
+
+        function logTerminal(message, type = 'info') {
+            terminalLog.textContent = `> ${message}`;
+            if (type === 'error') {
+                terminalLog.parentElement.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+                terminalLog.style.color = '#f87171';
+            } else {
+                terminalLog.parentElement.style.borderColor = 'rgba(6, 182, 212, 0.2)';
+                terminalLog.style.color = 'rgba(6, 182, 212, 0.8)';
+            }
+        }
+
+        async function initializeHardwareStream() {
+            logTerminal("Initiating local visual interface handshake protocol...");
+            hwStatus.textContent = "Negotiating Handshake";
+            hwStatus.className = "text-amber-500 font-bold";
+
+            const constraints = {
+                video: { width: { ideal: 640 }, height: { ideal: 640 }, facingMode: "user" },
+                audio: false
+            };
+
+            try {
+                if (rawStreamRef) {
+                    rawStreamRef.getTracks().forEach(track => track.stop());
+                }
+                rawStreamRef = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = rawStreamRef;
+                hwStatus.textContent = "ONLINE // SECURE";
+                hwStatus.className = "text-emerald-400 font-bold";
+                logTerminal("Neural web-feed pipeline aligned. Feed online.");
+            } catch (err) {
+                console.error("Camera access fault:", err);
+                hwStatus.textContent = "FAULT // DENIED";
+                hwStatus.className = "text-rose-500 font-bold";
+                logTerminal("Webcam communication interface failure. Check permissions.", "error");
+                alert("Hardware Stream Failure: Critical authorization was denied. Please allow camera permissions and refresh.");
+            }
+        }
+
+        function bindCoreInterfaceTriggers() {
+            // Trigger 1: Take Photo Frame Capture
+            document.getElementById('captureTrigger').addEventListener('click', () => {
+                if (!rawStreamRef) return;
+                AudioSynth.playSnap();
+                
+                // Visual Flash Layer Activation
+                const flash = document.getElementById('cameraOverlayFlash');
+                flash.style.opacity = '1';
+                setTimeout(() => flash.style.opacity = '0', 150);
+
+                // Transfer Stream State to Memory Canvas
+                frozenImageCanvas = document.createElement('canvas');
+                const scaleSize = Math.min(video.videoWidth, video.videoHeight) || 480;
+                frozenImageCanvas.width = scaleSize;
+                frozenImageCanvas.height = scaleSize;
+                
+                const ctx = frozenImageCanvas.getContext('2d');
+                // Mirror image horizontally to match standard camera behavior
+                ctx.translate(scaleSize, 0);
+                ctx.scale(-1, 1);
+                
+                // Center crop extraction square from streaming rectangular frames
+                const startX = (video.videoWidth - scaleSize) / 2;
+                const startY = (video.videoHeight - scaleSize) / 2;
+                ctx.drawImage(video, startX, startY, scaleSize, scaleSize, 0, 0, scaleSize, scaleSize);
+
+                // Shift Viewports
+                cameraStage.classList.add('hidden');
+                setupStage.classList.remove('hidden');
+                logTerminal("Bio-metric matrix frozen. Map structural configuration framework.");
+            });
+
+            // Trigger 2: Discard Configuration Layer
+            document.getElementById('retakeTrigger').addEventListener('click', () => {
+                setupStage.classList.add('hidden');
+                cameraStage.classList.remove('hidden');
+                logTerminal("Neural frame data purged. Realignment required.");
+            });
+
+            // Trigger 3: Bind Grid Size Selection Array Blocks
+            document.querySelectorAll('.density-selector-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    puzzleGridDensity = parseInt(e.currentTarget.getAttribute('data-density'));
+                    initializePuzzleExecutionSequence();
+                });
+            });
+
+            // Trigger 4: Strategic Control Modifications Abort System
+            document.getElementById('abortResetTrigger').addEventListener('click', executeTotalResetSequence);
+            document.getElementById('completeSystemResetTrigger').addEventListener('click', () => {
+                document.getElementById('resultsDiagnosticOverlay').classList.add('hidden');
+                executeTotalResetSequence();
+            });
+
+            // Trigger 5: Re-scramble grid configuration
+            document.getElementById('re-shuffleTrigger').addEventListener('click', () => {
+                if (!puzzleActive) return;
+                scrambleAndVerifySolvableGrid();
+                renderMatrixDomLayout();
+                resetChronometer();
+                startChronometer();
+                logTerminal("Matrix scrambled. Grid recalibrated.");
+            });
+
+            // Trigger 6: Play Again Same Image Loop Setup
+            document.getElementById('playAgainSamePhotoTrigger').addEventListener('click', () => {
+                document.getElementById('resultsDiagnosticOverlay').classList.add('hidden');
+                puzzleStage.classList.add('hidden');
+                setupStage.classList.remove('hidden');
+                logTerminal("Retained baseline visual frame structure. Adjust density rules.");
+            });
+        }
+
+        function executeTotalResetSequence() {
+            stopChronometer();
+            puzzleActive = false;
+            chronometerElapsed = 0;
+            moveCount = 0;
+            matrixArrays = [];
+            
+            liveTimer.textContent = "00:00.0";
+            moveCounterElem.textContent = "0";
+            accuracyElem.textContent = "0/0";
+
+            statsBar.classList.add('hidden');
+            auxControls.classList.add('hidden');
+            puzzleStage.classList.add('hidden');
+            setupStage.classList.add('hidden');
+            cameraStage.classList.remove('hidden');
+            
+            initializeHardwareStream();
+        }
+
+        // Logic Segment Core: Puzzle Core Initialization Engine
+        function initializePuzzleExecutionSequence() {
+            setupStage.classList.add('hidden');
+            puzzleStage.classList.remove('hidden');
+            statsBar.classList.remove('hidden');
+            auxControls.classList.remove('hidden');
+
+            puzzleContainer.style.gridTemplateColumns = `repeat(${puzzleGridDensity}, 1fr)`;
+            puzzleContainer.style.gridTemplateRows = `repeat(${puzzleGridDensity}, 1fr)`;
+
+            // Cut raw source memory canvas into individual cell image references
+            generateFragmentedMatrixSlices();
+            scrambleAndVerifySolvableGrid();
+            renderMatrixDomLayout();
+            
+            moveCount = 0;
+            moveCounterElem.textContent = "0";
+            puzzleActive = true;
+
+            resetChronometer();
+            startChronometer();
+            logTerminal(`Grid operational. Cells synced successfully. Solve the matrix.`);
+        }
+
+        function generateFragmentedMatrixSlices() {
+            matrixArrays = [];
+            const segments = puzzleGridDensity;
+            const piecePixelWidth = frozenImageCanvas.width / segments;
+            
+            let incrementalIndex = 0;
+            for (let row = 0; row < segments; row++) {
+                for (let col = 0; col < segments; col++) {
+                    const cellCanvas = document.createElement('canvas');
+                    cellCanvas.width = piecePixelWidth;
+                    cellCanvas.height = piecePixelWidth;
+                    const cellCtx = cellCanvas.getContext('2d');
+
+                    cellCtx.drawImage(
+                        frozenImageCanvas,
+                        col * piecePixelWidth, row * piecePixelWidth, piecePixelWidth, piecePixelWidth,
+                        0, 0, piecePixelWidth, piecePixelWidth
+                    );
+
+                    matrixArrays.push({
+                        permanentId: incrementalIndex,
+                        idealRow: row,
+                        idealCol: col,
+                        dataUrl: cellCanvas.toDataURL(),
+                        currentPositionIndex: incrementalIndex 
+                    });
+                    incrementalIndex++;
+                }
+            }
+        }
+
+        // Shuffling Engine utilizing Inversion Counting Theorems to assure solvability 
+        function scrambleAndVerifySolvableGrid() {
+            let arrays = [...matrixArrays];
+            let isSolvable = false;
+
+            while (!isSolvable) {
+                // Fisher-Yates Scramble Algorithm Execution Loop
+                for (let i = arrays.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arrays[i], arrays[j]] = [arrays[j], arrays[i]];
+                }
+
+                // Verify structural alignment match counts (Check inversion values matches grid dynamics)
+                let inversions = 0;
+                for (let i = 0; i < arrays.length; i++) {
+                    for (let j = i + 1; j < arrays.length; j++) {
+                        if (arrays[i].permanentId > arrays[j].permanentId) {
+                            inversions++;
+                        }
+                    }
+                }
+
+                // For simple row-column adjustments swap checks (Grid size independent confirmation rules)
+                // If cell shuffles happen randomly without blank slots, check if match state is locked
+                if (puzzleGridDensity % 2 !== 0) {
+                    isSolvable = (inversions % 2 === 0);
+                } else {
+                    isSolvable = (inversions % 2 === 0);
+                }
+                
+                // Anti-Stagnate validation backup trigger check
+                let absoluteMatches = 0;
+                arrays.forEach((item, index) => { if (item.permanentId === index) absoluteMatches++; });
+                if (absoluteMatches === arrays.length) isSolvable = false; 
+            }
+
+            // Remap array state to current structures variables
+            arrays.forEach((node, dynamicIndex) => {
+                node.currentPositionIndex = dynamicIndex;
+            });
+            
+            matrixArrays = arrays;
+        }
+
+        function renderMatrixDomLayout() {
+            puzzleContainer.innerHTML = '';
+            
+            let matchedElements = 0;
+            matrixArrays.forEach((piece) => {
+                const isCorrect = (piece.permanentId === piece.currentPositionIndex);
+                if (isCorrect) matchedElements++;
+
+                const elementNode = document.createElement('div');
+                elementNode.id = `node-piece-${piece.permanentId}`;
+                elementNode.setAttribute('data-id', piece.permanentId);
+                elementNode.setAttribute('data-current', piece.currentPositionIndex);
+                elementNode.className = `puzzle-node relative border overflow-hidden rounded-md transition-all ${isCorrect ? 'correct-slot' : 'incorrect-slot'}`;
+                elementNode.style.backgroundImage = `url(${piece.dataUrl})`;
+                elementNode.style.backgroundSize = 'cover';
+                elementNode.style.backgroundPosition = 'center';
+
+                // Desktop Drag Infrastructure Event Pipeline
+                elementNode.setAttribute('draggable', 'true');
+                elementNode.addEventListener('dragstart', handleDesktopDragStart);
+                elementNode.addEventListener('dragover', handleDesktopDragOver);
+                elementNode.addEventListener('drop', handleDesktopDropEvent);
+                elementNode.addEventListener('dragend', handleDesktopDragEnd);
+
+                // Advanced Smartphone Multi-touch Pointer Event Architecture
+                elementNode.addEventListener('touchstart', handleMobileTouchStart, { passive: false });
+                elementNode.addEventListener('touchmove', handleMobileTouchMove, { passive: false });
+                elementNode.addEventListener('touchend', handleMobileTouchEnd, { passive: false });
+
+                puzzleContainer.appendChild(elementNode);
+            });
+
+            accuracyElem.textContent = `${matchedElements}/${matrixArrays.length}`;
+        }
+
+        // Action Drivers Segment A: Desktop Native Drag Infrastructure Handlers
+        let structuralSourceElementIdCache = null;
+
+        function handleDesktopDragStart(e) {
+            if (!puzzleActive) return;
+            activeDraggedNode = this;
+            this.classList.add('dragging');
+            structuralSourceElementIdCache = this.getAttribute('data-id');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', structuralSourceElementIdCache);
+        }
+
+        function handleDesktopDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleDesktopDropEvent(e) {
+            e.preventDefault();
+            if (!puzzleActive || this === activeDraggedNode) return;
+
+            const droppedSourceId = parseInt(e.dataTransfer.getData('text/plain'));
+            const targetDestinationId = parseInt(this.getAttribute('data-id'));
+
+            executeGridNodeSwapAction(droppedSourceId, targetDestinationId);
+        }
+
+        function handleDesktopDragEnd() {
+            this.classList.remove('dragging');
+            activeDraggedNode = null;
+        }
+
+        // Action Drivers Segment B: Touch Interfacing Execution Modules
+        function handleMobileTouchStart(e) {
+            if (!puzzleActive) return;
+            e.preventDefault();
+            activeDraggedNode = this;
+            this.classList.add('dragging');
+            AudioSynth.playTick();
+        }
+
+        function handleMobileTouchMove(e) {
+            if (!puzzleActive || !activeDraggedNode) return;
+            e.preventDefault();
+
+            const contextTouch = e.touches[0];
+            // Render smooth dynamic visual translate response properties dynamically during drag cycles
+            const boundingBox = puzzleContainer.getBoundingClientRect();
+            
+            // Offset coordinates translation
+            const relativeX = contextTouch.clientX - boundingBox.left - (activeDraggedNode.offsetWidth / 2);
+            const relativeY = contextTouch.clientY - boundingBox.top - (activeDraggedNode.offsetHeight / 2);
+            
+            // Bound checks
+            activeDraggedNode.style.position = 'absolute';
+            activeDraggedNode.style.width = `${puzzleContainer.offsetWidth / puzzleGridDensity - 2}px`;
+            activeDraggedNode.style.height = `${puzzleContainer.offsetHeight / puzzleGridDensity - 2}px`;
+            activeDraggedNode.style.left = `${relativeX}px`;
+            activeDraggedNode.style.top = `${relativeY}px`;
+        }
+
+        function handleMobileTouchEnd(e) {
+            if (!puzzleActive || !activeDraggedNode) return;
+            e.preventDefault();
+
+            activeDraggedNode.classList.remove('dragging');
+            const endTouch = e.changedTouches[0];
+            
+            // Clean spatial property assignments up
+            activeDraggedNode.style.position = '';
+            activeDraggedNode.style.width = '';
+            activeDraggedNode.style.height = '';
+            activeDraggedNode.style.left = '';
+            activeDraggedNode.style.top = '';
+
+            // Detect matching drop zone overlap indices underneath screen touch offsets
+            const itemElementTarget = document.elementFromPoint(endTouch.clientX, endTouch.clientY);
+            const verifiedTargetPieceNode = itemElementTarget ? itemElementTarget.closest('.puzzle-node') : null;
+
+            if (verifiedTargetPieceNode && verifiedTargetPieceNode !== activeDraggedNode) {
+                const srcId = parseInt(activeDraggedNode.getAttribute('data-id'));
+                const targetId = parseInt(verifiedTargetPieceNode.getAttribute('data-id'));
+                executeGridNodeSwapAction(srcId, targetId);
+            } else {
+                renderMatrixDomLayout(); // Revert back to original layout rules cleanly
+            }
+            activeDraggedNode = null;
+        }
+
+        // Central Array Mutations Router
+        function executeGridNodeSwapAction(sourcePieceId, targetPieceId) {
+            let sourceNodeObj = matrixArrays.find(p => p.permanentId === sourcePieceId);
+            let targetNodeObj = matrixArrays.find(p => p.permanentId === targetPieceId);
+
+            const intermediateCacheIndex = sourceNodeObj.currentPositionIndex;
+            sourceNodeObj.currentPositionIndex = targetNodeObj.currentPositionIndex;
+            targetNodeObj.currentPositionIndex = intermediateCacheIndex;
+
+            // Resort core matrix structural data sequences
+            matrixArrays.sort((a, b) => a.currentPositionIndex - b.currentPositionIndex);
+
+            moveCount++;
+            moveCounterElem.textContent = moveCount;
+            AudioSynth.playSnap();
+
+            renderMatrixDomLayout();
+            evaluateSystemCompletionStatus();
+        }
+
+        function evaluateSystemCompletionStatus() {
+            let globalClearedMatches = 0;
+            matrixArrays.forEach((item) => {
+                if (item.permanentId === item.currentPositionIndex) globalClearedMatches++;
+            });
+
+            if (globalClearedMatches === matrixArrays.length) {
+                executeWinStateProcessingSequence();
+            }
+        }
+
+        // Logic Segment Core: Diagnostics Win Overlap Handlers
+        function executeWinStateProcessingSequence() {
+            stopChronometer();
+            puzzleActive = false;
+            AudioSynth.playSuccessCascade();
+
+            // Run Confetti Exploder Cascade
+            confetti({ particleCount: 140, spread: 85, origin: { y: 0.6 } });
+
+            // Lock score indicators data inside local cache arrays
+            const verifiedFormattedTime = computeChronometerTextOutput(chronometerElapsed);
+            saveMetricsToLeaderboard(puzzleGridDensity, moveCount, chronometerElapsed, verifiedFormattedTime);
+
+            // Display UI Interface overlays panels
+            document.getElementById('finalMetricDensity').textContent = `${puzzleGridDensity}×${puzzleGridDensity}`;
+            document.getElementById('finalMetricTime').textContent = verifiedFormattedTime;
+            document.getElementById('finalMetricMoves').textContent = moveCount;
+            
+            // Build tailored computational evaluation phrases
+            let validationPhrase = "";
+            if (moveCount < puzzleGridDensity * 12) validationPhrase = "Flawless optimization vector. Your structural recognition precision ranks within top-tier algorithmic capacities.";
+            else if (moveCount < puzzleGridDensity * 25) validationPhrase = "Stable calibration complete. Your sorting mechanism functions inside acceptable matrix constraints.";
+            else validationPhrase = "Matrix resolved successfully, though diagnostic records show extended iteration cycle overhead loops.";
+
+            document.getElementById('performanceDiagnosticsPhrase').textContent = validationPhrase;
+            document.getElementById('resultsDiagnosticOverlay').classList.remove('hidden');
+            logTerminal("Matrix reconstruction successfully matched. Chronometer locked.");
+        }
+
+        // Chronometer Management Operations
+        function startChronometer() {
+            chronometerStart = performance.now() - chronometerElapsed;
+            chronometerIntervalRef = requestAnimationFrame(updateChronometerFrame);
+        }
+
+        function updateChronometerFrame() {
+            if (!puzzleActive) return;
+            chronometerElapsed = performance.now() - chronometerStart;
+            liveTimer.textContent = computeChronometerTextOutput(chronometerElapsed);
+            chronometerIntervalRef = requestAnimationFrame(updateChronometerFrame);
+        }
+
+        function stopChronometer() {
+            if (chronometerIntervalRef) {
+                cancelAnimationFrame(chronometerIntervalRef);
+                chronometerIntervalRef = null;
+            }
+        }
+
+        function resetChronometer() {
+            stopChronometer();
+            chronometerElapsed = 0;
+            liveTimer.textContent = "00:00.0";
+        }
+
+        function computeChronometerTextOutput(totalMsDurations) {
+            let workingMinutes = Math.floor(totalMsDurations / 60000);
+            let remainingSeconds = Math.floor((totalMsDurations % 60000) / 1000);
+            let millisecondsTenths = Math.floor((totalMsDurations % 1000) / 100);
+
+            let strMin = workingMinutes.toString().padStart(2, '0');
+            let strSec = remainingSeconds.toString().padStart(2, '0');
+
+            return `${strMin}:${strSec}.${millisecondsTenths}`;
+        }
+
+        // Cache Database LocalStorage Interfacing Engine
+        function saveMetricsToLeaderboard(density, moves, rawMs, readableTime) {
+            let highScoresList = [];
+            try {
+                highScoresList = JSON.parse(localStorage.getItem('chronoFaceLeaderboard')) || [];
+            } catch(e) { highScoresList = []; }
+
+            const newScorePayload = {
+                dateStamp: new Date().toLocaleDateString(undefined, {month:'short', day:'numeric'}),
+                densityParam: `${density}×${density}`,
+                movesMetric: moves,
+                rawDuration: rawMs,
+                timeString: readableTime
+            };
+
+            highScoresList.push(newScorePayload);
+            // Sort by density difficulty level first, then ascending time vectors
+            highScoresList.sort((a, b) => a.rawDuration - b.rawDuration);
+            
+            // Limit array bounds strictly to top 5 slots
+            if (highScoresList.length > 5) highScoresList = highScoresList.slice(0, 5);
+
+            localStorage.setItem('chronoFaceLeaderboard', JSON.stringify(highScoresList));
+            renderSavedLeaderboard();
+        }
+
+        function renderSavedLeaderboard() {
+            const viewport = document.getElementById('leaderboardViewport');
+            let cachedScores = [];
+            
+            try {
+                cachedScores = JSON.parse(localStorage.getItem('chronoFaceLeaderboard')) || [];
+            } catch(e) { cachedScores = []; }
+
+            if (cachedScores.length === 0) {
+                viewport.innerHTML = `<p class="text-center text-slate-500 py-6 italic font-medium">No system high records synced yet.</p>`;
+                return;
+            }
+
+            let htmlBuffer = `<table class="w-full text-left font-mono border-collapse">
+                <thead>
+                    <tr class="border-b border-slate-800 text-[9px] uppercase tracking-wider text-slate-500 font-bold">
+                        <th class="pb-2">Date</th>
+                        <th class="pb-2">Grid</th>
+                        <th class="pb-2 text-center">Shifts</th>
+                        <th class="pb-2 text-right text-cyan-400">Duration</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-900 text-slate-300">`;
+
+            cachedScores.forEach((row) => {
+                htmlBuffer += `
+                    <tr class="hover:bg-slate-900/40 transition-colors">
+                        <td class="py-2 text-slate-400 text-[11px]">${row.dateStamp}</td>
+                        <td class="py-2 font-bold text-fuchsia-400 text-[11px]">${row.densityParam}</td>
+                        <td class="py-2 text-center text-slate-400 text-[11px]">${row.movesMetric}</td>
+                        <td class="py-2 text-right font-bold text-emerald-400 text-[11px]">${row.timeString}</td>
+                    </tr>`;
+            });
+
+            htmlBuffer += `</tbody></table>`;
+            viewport.innerHTML = htmlBuffer;
+        }
+    </script>
+</body>
+</html>
