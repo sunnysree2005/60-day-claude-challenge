@@ -1,0 +1,48 @@
+# Interactive Learning Studio: Frequency Modulation (FM) and Phase Modulation (PM) Fundamentals
+
+Interactive Learning Studio is a premium, browser-based educational platform developed as part of Day 41 of the 60-Day Claude Challenge. Designed for immersive engineering and physics education, it delivers a fully interactive, comprehensive tutorial on **Frequency Modulation (FM) and Phase Modulation (PM) Fundamentals** entirely client-side with zero external frameworks or backend dependencies.
+
+---
+
+## 🚀 Key Features
+
+### 1. Structured 4-Module Curriculum
+
+The tutorial guides learners progressively from foundational theory to advanced engineering applications:
+
+* **Module 1: Foundations of Angle Modulation** — Introduces carrier waves, baseband signals, and the core mathematical definitions separating amplitude modulation from angle modulation.
+* **Module 2: Frequency Modulation (FM) Deep Dive** — Explores instantaneous frequency deviation, Carson's Rule, modulation index ($m_f$), and Bessel functions of the first kind.
+* **Module 3: Phase Modulation (PM) & PM-FM Interrelationship** — Investigates phase deviation, phase-frequency differentiation links, and practical waveform comparisons.
+* **Module 4: Generation, Demodulation & Practical Systems** — Covers indirect (Armstrong) and direct generation, PLL demodulators, limiter-discriminator circuits, and commercial FM radio broadcasting standards.
+
+### 2. Interactive Assessments & Quizzes
+
+* **Post-Module Quizzes:** Each module concludes with a 4-question interactive quiz featuring automated scoring, instant feedback, and detailed explanations for every answer option.
+* **Performance Summaries:** Unlocks subsequent modules dynamically only after satisfactory comprehension checks.
+
+### 3. Commercial-Grade UI/UX & Design
+
+* **Polished Interface:** Styled like an elite commercial learning platform with smooth transition animations, responsive layouts, and progress tracking bars.
+* **Built-In Dark Mode:** Fully toggleable light and dark themes tailored for comfortable long-form studying.
+* **Printable Notes & Cheat Sheets:** Integrated tools to export summary notes and quick-reference sheets directly from the browser.
+
+---
+
+## 🛠️ Technical Stack
+
+* **Architecture:** Single-file architecture (`index.html`) containing fully integrated semantic HTML5, modern CSS3 with custom properties, and modular vanilla JavaScript.
+* **Zero Dependencies:** Completely self-contained without requiring heavy external libraries, CDNs, or server-side runtimes. Works entirely offline following the initial page load.
+
+---
+
+## 🏃‍♂️ Quick Start
+
+1. Clone or download this repository.
+2. Open the `index.html` file directly in any modern web browser (Google Chrome, Mozilla Firefox, Microsoft Edge, or Apple Safari).
+3. Begin your interactive learning journey immediately!
+
+---
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
